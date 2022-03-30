@@ -1,0 +1,142 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh">
+  <head>
+    <meta charset="UTF-8" />
+    <title>志愿填报</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <link rel="stylesheet" href="{% static 'yingding/jssdk/sdk.css' %}" />
+    <link rel="stylesheet" href="{% static 'yingding/jssdk/helper.css' %}" />
+    <link rel="stylesheet" href="{% static 'yingding/jssdk/iconfont.css' %}" />
+    <!-- 这是默认主题所需的，如果是其他主题则不需要 -->
+    <!-- 从 1.1.0 开始 sdk.css 将不支持 IE 11，如果要支持 IE11 请引用这个 css，并把前面那个删了 -->
+    <!-- <link rel="stylesheet" href="sdk-ie11.css" /> -->
+    <!-- 不过 amis 开发团队几乎没测试过 IE 11 下的效果，所以可能有细节功能用不了，如果发现请报 issue -->
+    <style>
+      html,
+      body,
+      .app-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" class="app-wrapper"></div>
+    <script src="{% static 'yingding/jssdk/sdk.js' %}"></script>
+    <script type="text/javascript">
+      (function () {
+        let amis = amisRequire('amis/embed');
+        // 通过替换下面这个配置来生成不同页面
+        let amisJSON = {
+          'type': 'page',
+          'body':[
+              {
+              "type": "form",
+              "title":"数据筛选",
+              "actionType":"reload",
+              "target":"my_crud",
+<!--              "debug": true,-->
+              "body": [
+                {
+                  "type": "condition-builder",
+                  "label": "条件组合",
+                  "name": "conditions",
+                  "description": "欢迎使用赢鼎教育志愿填报系统！历年录取线为该院校专业组当年投档最低分。",
+                  "searchable": true,
+                  "fields": [
+                    {
+                      "label": "2021录取线",
+                      "type": "number",
+                      "name": "admissions_data.line_2021",
+                      "operators":['equal', 'less_or_equal', 'between'],
+                    },
+                    {
+                      "label":"所在省份",
+                      "type":"select",
+                      "name":"admissions_data.provinces",
+                      "options":[
+                        {"label":"北京市","value":"北京"},
+                        {"label":"上海市","value":"上海"},
+                        {"label":"天津市","value":"天津"},
+                        {"label":"重庆市","value":"重庆"},
+                        {"label":"江苏省","value":"江苏"},
+                        {"label":"浙江省","value":"浙江"},
+                        {"label":"安徽省","value":"安徽"},
+                        {"label":"江西省","value":"江西"},
+                        {"label":"福建省","value":"福建"},
+                        {"label":"广东省","value":"广东"},
+                        {"label":"广西壮族自治区","value":"广西"},
+                        {"label":"海南省","value":"海南"},
+                        {"label":"湖南省","value":"湖南"},
+                        {"label":"湖北省","value":"湖北"},
+                        {"label":"云南省","value":"云南"},
+                        {"label":"贵州省","value":"贵州"},
+                        {"label":"四川省","value":"四川"},
+                        {"label":"河南省","value":"河南"},
+                        {"label":"河北省","value":"河北"},
+                        {"label":"山东省","value":"山东"},
+                        {"label":"山西省","value":"山西"},
+                        {"label":"陕西省","value":"陕西"},
+                        {"label":"辽宁省","value":"辽宁"},
+                        {"label":"吉林省","value":"吉林"},
+                        {"label":"黑龙江省","value":"黑龙江"},
+                        {"label":"青海省","value":"青海"},
+                        {"label":"宁夏回族自治区","value":"宁夏"},
+                        {"label":"甘肃省","value":"甘肃"},
+                        {"label":"西藏自治区","value":"西藏"},
+                        {"label":"新疆维吾尔自治区","value":"新疆"},
+                        {"label":"内蒙古自治区","value":"内蒙古"},
+                      ],
+                    },
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "crud",
+              "name":"my_crud",
+              "api": {
+                "method":"post",
+                "url":"api/admissions/filter",
+                "headers":{
+                  "X-CSRFToken":"{{ csrf_token }}"
+                }
+              },
+              "syncLocation": false,
+              "resizable":true,
+              "affixHeader": false,
+              "rowClassNameExpr": "<%= data.id % 2 ? 'bg-light' : '' %>",
+              "columns": [
+                {% for field in admissions_data_fields %}
+                {% if field.name == "major_group_name" %}
+                {
+                  "name":"{{ field.name }}",
+                  "label": "{{ field.label }}",
+                  "width":300,
+                },
+                {% else %}
+                {
+                  "name":"{{ field.name }}",
+                  "label": "{{ field.label }}",
+                  "align":"center"
+                },
+                {% endif %}
+                {% endfor %}
+              ]
+            }
+          ]
+        };
+        let amisScoped = amis.embed('#root', amisJSON);
+      })();
+    </script>
+  </body>
+</html>
